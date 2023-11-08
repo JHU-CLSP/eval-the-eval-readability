@@ -6,7 +6,9 @@ import hashlib
 import time
 import tqdm
 import os
-from openai.error import InvalidRequestError
+import sys
+csv.field_size_limit(sys.maxsize)
+from openai.error import InvalidRequestError, APIError, RateLimitError
 
 def call_chatgpt_api(args, model_name, input_text, system, stop_tokens):
     messages = []
@@ -66,6 +68,44 @@ def call_openai_api(args, model_name, input_text, stop_tokens):
         }
 
     return result, api_call_parameters
+
+def call_api(args, model_name, row, input_text, stop_tokens, max_tries=3):
+    text_response = None
+    result = {}
+    n_tries = 0
+    while (text_response is None) and (n_tries < max_tries):
+        if model_name == "gpt-3.5-turbo":
+            # If there are system instructions
+            if 'system' in row:
+                system = row['system']
+            else:
+                system = None
+            # Truncate input if we reach the input limit
+            try:
+                result, api_call_parameters = call_chatgpt_api(args, model_name, input_text, system, stop_tokens)
+                text_response = result['choices'][0]['message']['content'].strip()
+            except InvalidRequestError:
+                input_text = truncate_question(input_text, truncate_input=args.truncate_input)
+            except APIError:
+                time.sleep(5)
+            except RateLimitError:
+                time.sleep(60)
+
+
+        # Other GPT Models
+        else:
+            try:
+                result, api_call_parameters = call_openai_api(args, model_name, input_text, stop_tokens)
+                text_response = result['choices'][0]['text'].strip()
+            except InvalidRequestError:
+                input_text = truncate_question(input_text, truncate_input=args.truncate_input)
+            except APIError:
+                time.sleep(5)
+            except RateLimitError:
+                time.sleep(60)
+
+        n_tries += 1
+    return result, text_response
 
 def truncate_question(question, truncate_input=2000):
     split_question= question.split(' ')
@@ -140,6 +180,22 @@ def parse_args():
             "From OpenAI documentation: Include the log probabilities on the `logprobs` most likely tokens, as well the chosen tokens. For example, if logprobs is 5, the API will return a list of the 5 most likely tokens. The API will always return the logprob of the sampled token, so there may be up to logprobs+1 elements in the response."
         ),
     )
+    parser.add_argument(
+        "--max-api-tries",
+        type=int,
+        default=3,
+        help=(
+            "Maximum number of times to retry an API Call before quitting."
+        )
+    )
+    parser.add_argument(
+        "--resume-from",
+        type=int,
+        default=0,
+        help=(
+            "Example index to resume from. Use when a script crashes and you need to restart."
+        )
+    )
     args = parser.parse_args()
 
     return args
@@ -157,19 +213,21 @@ if __name__ == "__main__":
     openai.api_key = os.environ.get('OPENAI_API_KEY')
 
     args = parse_args()
+    print(args)
 
     stop_tokens = None
     if args.use_stop_tokens:
         stop_tokens = ['<|endoftext|>']  # Can add additional stop tokens here
 
     model_names = args.model_names.split(',')
-    
-    with open(args.input) as input, open(args.output, 'w') as output:
+    output_mode = 'a' if args.resume_from > 0 else 'w'
+
+    with open(args.input, 'r', encoding="utf-8") as input, open(args.output, output_mode, newline='') as output:
         reader = csv.DictReader(input)
         writer = None
         
         for ii, row in tqdm.tqdm(enumerate(reader), desc='API'):
-            if row['question']:
+            if row['question'] and ii >= args.resume_from:
                 question = row['question']
                 input_text = question + '\n\n'
                 
@@ -179,38 +237,16 @@ if __name__ == "__main__":
                 for model_name in model_names:
                     if ii > 0:
                         time.sleep(1)
-                    # Chat GPT
-                    if model_name == "gpt-3.5-turbo":
-                        # If there are system instructions
-                        if 'system' in row:
-                            system = row['system']
-                        else:
-                            system = None
-                        # Truncate input if we reach the input limit
-                        try:
-                            result, api_call_parameters = call_chatgpt_api(args, model_name, input_text, system, stop_tokens)
-                        except InvalidRequestError:
-                            input_text = truncate_question(input_text, truncate_input=args.truncate_input)
-                            result, api_call_parameters = call_chatgpt_api(args, model_name, input_text, system, stop_tokens)
-                        text_response = result['choices'][0]['message']['content'].strip()
-
-                    # Other GPT Models
-                    else:
-                        try:
-                            result, api_call_parameters = call_openai_api(args, model_name, input_text, stop_tokens)
-                        except InvalidRequestError:
-                            input_text = truncate_question(input_text, truncate_input=args.truncate_input)
-                            result, api_call_parameters = call_openai_api(args, model_name, input_text, stop_tokens)
-                        text_response = result['choices'][0]['text'].strip()
-
+                    result, text_response = call_api(args, model_name, row, input_text, stop_tokens, max_tries=args.max_api_tries)
                     row[model_name] = text_response
                     row['result_' + model_name] = json.dumps(result)
             
-            if not writer:
-                columns = row.keys()
-                writer = csv.DictWriter(output, fieldnames=columns)
-                writer.writeheader()
+                if not writer:
+                    columns = row.keys()
+                    writer = csv.DictWriter(output, fieldnames=columns)
+                    if output_mode=='w': # Only write header when writing to a new file 
+                        writer.writeheader()
                 
-            # print(row)
-            writer.writerow(row)
-            output.flush()
+                # print(row)
+                writer.writerow(row)
+                output.flush()
