@@ -19,7 +19,10 @@ We use the following summarization datasets:
 
 Our human annotated readability data is from [August et al 2024.](https://dl.acm.org/doi/10.1145/3613904.3642289)
 
-**Data format:** The code expects the data in a text file, with each new line containing a sumamry. For the HuggingFace datasets, use the following command to load and format the data:
+**Data format:** The code expects the data in a text file, with each new line containing a summary. 
+
+
+For the HuggingFace datasets, use the following command to load and format the data:
 ```{bash}
 $ python scripts/format_data.py \
 --dataset_name <HF_DATASET_NAME> \
