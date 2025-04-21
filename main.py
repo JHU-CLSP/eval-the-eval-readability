@@ -49,7 +49,6 @@ if __name__=="__main__":
     parser.add_argument('model_name')
     parser.add_argument('data_path')
     parser.add_argument('out_path')
-    parser.add_argument('--annotator_data_path')
     parser.add_argument('-t', '--temperature', dest='temperature', type=float, default=0.8)
     parser.add_argument('-bsz', '--batch_size', dest='batch_size', type=int, default=1)
     parser.add_argument('--max_n', type=int, default=-1)
@@ -75,7 +74,7 @@ if __name__=="__main__":
     logging.info(f"Device map = {pipeline.model.hf_device_map}")
 
     start = time.time()
-    data_processor = get_data_processor(args.data_path, annotator_data_path=args.annotator_data_path, prompt_name=args.prompt_name)
+    data_processor = get_data_processor(args.data_path, prompt_name=args.prompt_name)
     messages_list = data_processor.get_messages()
     if args.max_n > 0:
         messages_list = messages_list[:args.max_n]

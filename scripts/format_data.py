@@ -1,17 +1,46 @@
 from datasets import load_dataset
+import argparse
+import torch
+from tqdm import tqdm
+import time
+import logging
+import pandas as pd
+import re 
+import csv
 
-ds = load_dataset("loukritia/science-journal-for-kids-data")
 
-kids_abstract = ds['train']['Kids Abstract']
+def main(args):
+    if args.subset:
+        ds = load_dataset(args.dataset_name, args.subset)
+    else:
+        ds = load_dataset(args.dataset_name)
+    summaries = ds[args.split][args.summary_col]
 
-og_abstract = ds['train']['Abstract (Original academic paper)']
+    with open(args.outfile, 'w') as fout:
+        for i in range(len(summaries)):
+            if type(summaries[i]) is list:
+                summ =  summaries[i][0]
+            elif type(summaries[i]) is str:
+                summ = summaries[i]
+            else:
+                raise ValueError
+            summaries[i] = summ.replace('\n', ' ').strip()
+        logging.info(f"Writing {len(summaries)} to {args.outfile}")
+        fout.write('\n'.join(summaries))
 
-with open('/scratch4/mdredze1/icachol1/layscisum/targets/skj.target', 'w') as fout:
-    for i in range(len(kids_abstract)):
-        kids_abstract[i] = kids_abstract[i].replace('\n', ' ').strip()
-    fout.write('\n'.join(kids_abstract))
+if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset_name', required=True)
+    parser.add_argument('--subset')
+    parser.add_argument('--split', required=True)
+    parser.add_argument('--summary_col', required=True)
+    parser.add_argument('--outfile', required=True)
+    # parser.add_argument('out_path')
+    args = parser.parse_args()
 
-with open('/scratch4/mdredze1/icachol1/layscisum/inputs/skj.inputs', 'w') as fout:
-    for i in range(len(og_abstract)):
-        og_abstract[i] = og_abstract[i].replace('\n', ' ').strip()
-    fout.write('\n'.join(og_abstract))
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
+
+    start = time.time()
+    main(args)
+    end = time.time()
+    logging.info(f'Time to run script: {end-start} secs')
