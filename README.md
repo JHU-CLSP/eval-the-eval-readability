@@ -1,7 +1,16 @@
 # Evaluating the Evaluators
 
-## Setup
+This repo cotains the code for [Evaluating the Evaluators: Are readability metrics good measures of readability?](https://) If you use this repo, please cite the following paper:
+```
+<INSERT BIBTEX>
+```
 
+## Setup
+```{bash}
+$ conda create python==3.9.16 --name eval-readability
+$ conda activate eval-readability
+$ python setup.py clean install
+```
 
 ## Datasets
 We use the following summarization datasets:
@@ -48,7 +57,7 @@ We use the following language models:
 
 
 
-## Running Code
+## Running Model Inference Code
 
 
 The following command prompts the model to rate the readability of the summaries in the input file:
@@ -64,3 +73,10 @@ The following command runs a script to extract the model ratings:
 ```{bash}
 $ python scripts/get_rating.py </PATH/TO/OUTPUT_FILE>
 ```
+
+## Analysis
+
+Jupyter notebooks with the analysis code can be found in `analysis/`. 
+
+- `analysis/model_analysis.ipynb` contains the code for comparing the human judgements to traditional metrics and LM readability judgements. (Sec 4.1-4.2)
+- `analysis/dataset_analysis.ipynb` contains the code for the LM based evaluation for readability datasets. (Sec 4.3)
