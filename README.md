@@ -76,9 +76,9 @@ The following command runs a script to extract the model ratings:
 $ python scripts/get_rating.py </PATH/TO/OUTPUT_FILE>
 ```
 
-The output from our experiments on dataset analysis is available [here](https://drive.google.com/file/d/1hZDnHklb6NM_XrmyrtWQRKEO0eqeWZ2e/view?usp=sharing).
+The outputs from our experiments on dataset analysis is available [here](https://drive.google.com/file/d/1hZDnHklb6NM_XrmyrtWQRKEO0eqeWZ2e/view?usp=sharing).
 
-The output from our experiments on model analysis is available [here](https://).
+The outputs from our experiments on model analysis is available [here](https://drive.google.com/file/d/1_lRwyGhm0W43lsuBHlLo1EgCc6nCtm4h/view?usp=sharing).
 
 ## Analysis
 
