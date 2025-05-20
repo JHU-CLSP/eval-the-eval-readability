@@ -137,3 +137,5 @@ dmypy.json
 
 # Ignore images
 *.png
+
+*.jsonl

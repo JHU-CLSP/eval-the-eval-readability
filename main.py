@@ -33,14 +33,12 @@ def prompt_os(messages_list, pipeline, temperature, max_tokens, batch_size) -> l
         pipeline.tokenizer.convert_tokens_to_ids("<|eot_id|>")
     ]
     
-    # for prompt in prompt_list:
     for i in tqdm(range(0, len(messages_list), batch_size)):
         
         print(f"Running batch {i} to {i + min(batch_size, len(messages_list)-i)} with temperature {temperature}")
         
         messages_batch = messages_list[i : i + batch_size]
-        prompt_batch = [pipeline.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True) for messages in messages_batch]
-        response_list += call_model(prompt_batch, max_tokens, terminators, temperature)
+        response_list += call_model(messages_batch, max_tokens, terminators, temperature)
 
     return response_list
 
@@ -52,7 +50,7 @@ if __name__=="__main__":
     parser.add_argument('-t', '--temperature', dest='temperature', type=float, default=0.8)
     parser.add_argument('-bsz', '--batch_size', dest='batch_size', type=int, default=1)
     parser.add_argument('--max_n', type=int, default=-1)
-    parser.add_argument('--prompt_name', default="simple_prompt")
+    parser.add_argument('--prompt_name', default="own_reasoning_prompt")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
@@ -65,11 +63,12 @@ if __name__=="__main__":
         "text-generation",
         model=args.model_name,
         device_map="auto", 
-        torch_dtype=torch.float16,
+        model_kwargs={"torch_dtype": torch.bfloat16},
         batch_size=args.batch_size,
         trust_remote_code=True
     )
-    pipeline.tokenizer.pad_token_id = pipeline.model.config.bos_token_id
+
+    pipeline.tokenizer.pad_token_id = pipeline.model.config.eos_token_id
     pipeline.tokenizer.padding_side = "left"
     logging.info(f"Device map = {pipeline.model.hf_device_map}")
 
