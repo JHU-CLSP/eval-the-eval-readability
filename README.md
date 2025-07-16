@@ -47,8 +47,6 @@ $ python scripts/format_data.py \
 
 ## Models
 We use the following language models:
-- [OLMo-2 7B Instruct](https://huggingface.co/allenai/OLMo-2-1124-7B-Instruct)
-- [OLMo-2 13B Instruct](https://huggingface.co/allenai/OLMo-2-1124-13B-Instruct)
 - [Mistral 7B Instruct](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)
 - [Mixtral-8x7B Instruct](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1)
 - [gemma 1.1 7b Instruct](https://huggingface.co/google/gemma-1.1-7b-it)
@@ -76,13 +74,9 @@ The following command runs a script to extract the model ratings:
 $ python scripts/get_rating.py </PATH/TO/OUTPUT_FILE>
 ```
 
-The outputs from our experiments on dataset analysis is available [here](https://drive.google.com/file/d/1hZDnHklb6NM_XrmyrtWQRKEO0eqeWZ2e/view?usp=sharing).
-
-The outputs from our experiments on model analysis is available [here](https://drive.google.com/file/d/1_lRwyGhm0W43lsuBHlLo1EgCc6nCtm4h/view?usp=sharing).
-
 ## Analysis
 
 Jupyter notebooks with the analysis code can be found in `analysis/`. 
 
-- `analysis/model_analysis.ipynb` contains the code for comparing the human judgements to traditional metrics and LM readability judgements. (Sec 4.1-4.2)
-- `analysis/dataset_analysis.ipynb` contains the code for the LM based evaluation for readability datasets. (Sec 4.3)
+- `analysis/model_analysis.ipynb` contains the code for comparing the human judgements to traditional metrics and LM readability judgements. (Sec 4.2-4.3)
+- `analysis/dataset_analysis.ipynb` contains the code for the LM based evaluation for readability datasets. (Sec 4.4)

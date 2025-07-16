@@ -68,7 +68,7 @@ if __name__=="__main__":
         trust_remote_code=True
     )
 
-    pipeline.tokenizer.pad_token_id = pipeline.model.config.eos_token_id
+    pipeline.tokenizer.pad_token_id = pipeline.model.config.bos_token_id
     pipeline.tokenizer.padding_side = "left"
     logging.info(f"Device map = {pipeline.model.hf_device_map}")
 

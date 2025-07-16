@@ -4,6 +4,7 @@ import argparse
 import logging
 import time
 
+no_prompt = "{}"
 
 # https://www.ascb.org/science-policy-public-outreach/science-outreach/communication-toolkits/best-practices-in-effective-science-communication/
 ascb_prompt = """\

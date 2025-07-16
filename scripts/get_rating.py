@@ -49,7 +49,6 @@ def main(args):
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('rating_path')
-    # parser.add_argument('out_path')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
