@@ -15,14 +15,15 @@ $ python setup.py clean install
 ```
 
 ## Datasets
+
 We use the following summarization datasets:
 - [arXiv](https://huggingface.co/datasets/armanc/scientific_papers)
 - [PubMed](https://huggingface.co/datasets/armanc/scientific_papers)
 - [SciTLDR](https://huggingface.co/datasets/allenai/scitldr)
-- [Science Journal for Kids](https://huggingface.co/datasets/loukritia/science-journal-for-kids-data)
+- [Science Journal for Kids](https://huggingface.co/datasets/loukritia/science-journal-for-kids-data)**
 - [CDSR](https://github.com/qiuweipku/Plain_language_summarization)
 - [PLOS](https://huggingface.co/datasets/tomasg25/scientific_lay_summarisation)
-- [eLife](https://huggingface.co/datasets/tomasg25/scientific_lay_summarisation)**
+- [eLife](https://huggingface.co/datasets/tomasg25/scientific_lay_summarisation)
 - [Eureka](https://github.com/slab-itu/HTSS/)
 - [CELLS](https://github.com/LinguisticAnomalies/pls_retrieval)
 - [SciNews](https://huggingface.co/datasets/dongqi-me/SciNews)
@@ -75,6 +76,8 @@ $ python scripts/get_rating.py </PATH/TO/OUTPUT_FILE>
 ```
 
 ## Analysis
+
+We release the results of our literature survey (Sec 4.1) [here](https://docs.google.com/spreadsheets/d/1JvWoOH-KKq83yCmV11YNYJnGolgMgkTUCQPkH9kY85c/edit?usp=sharing).
 
 Jupyter notebooks with the analysis code can be found in `analysis/`. 
 
